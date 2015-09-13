@@ -1,6 +1,7 @@
-import AmazonCrawler
+import DBLPCrawler
 __author__ = 'lk1195'
 
 
-amazonCrawler = AmazonCrawler.AmazonCrawler()
-amazonCrawler.get_book_xml_link()
+dblpCrawler = DBLPCrawler.DBLPCrawler()
+# dblpCrawler.get_books_by_link('http://dblp.uni-trier.de/db/journals/corr/corr1501.html')
+dblpCrawler.get_books_by_search("Cormen")
