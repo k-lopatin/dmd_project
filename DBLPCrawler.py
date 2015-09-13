@@ -67,9 +67,9 @@ def book_from_xml(xml):
     book = Publication(title, authors, year, link)
 
     # contributor. It can be not existing
-    contributor = re.search('<journal>(.+?)</journal', xml)
-    if contributor is not None:
-        contributor = contributor.group(1)
-        book.add_contributor(contributor)
+    publisher = re.search('<journal>(.+?)</journal', xml)
+    if publisher is not None:
+        publisher = publisher.group(1)
+        book.add_contributor(publisher)
 
     book.print_info()

@@ -4,72 +4,58 @@ from Publication import Publication
 import time
 
 
-class DBLPCrawler:
+class BSCrawler:
     def __init__(self):
-        self.base_href = "http://dblp.uni-trier.de/"
-        self.base_xml_href = self.base_href + "rec/xml/"
-        self.base_db_link = self.base_href + "db/"
+        self.base_href = "http://academic.research.microsoft.com/"
 
-    def get_books_by_link(self, link):
-        print(link)
+    def get_books_by_search(self, s):
+
+        link = self.base_href + "Search?query=" + s.lower()
+
         response = requests.get(link)
         html = response.text
-        search = re.findall('<li class="entry.*?<small>(.+?)</small>', html)
-        count = 0
-        count2 = 1
+        # html = re.sub("\r", '', html)
+        html = html.replace('\r\n', '')
+        # print(html)
+
+        search = re.findall('<li class="paper-item">(.*?)</li>', html)
         for s in search:
-            self.get_book_xml(s)
-            print(count2)
-            count2 += 1
+            self.get_book_from_block(s)
 
-            if count > 10:
-                time.sleep(5)
-                count = 0
+    def get_book_from_block(self, block):
+        title = re.search('<h3>.*?<a.*?>(.*?)</a>', block)
+        if title is not None:
+            title = title.group(1)
+        else:
+            title = ""
 
-            count += 1
-            time.sleep(5)
+        authors = re.findall('class="author-name-tooltip".*?>(.*?)</a>', block)
+        for i, auth in enumerate(authors):
+            authors[i] = re.sub('<.*?>', '', auth)
 
-    def get_book_xml(self, link):
-        response = requests.get(self.base_xml_href + link + ".xml")
-        book_from_xml(response.text)
-        print()
-        print()
+        year = re.search('class="conference">.*?<span.*? (\d{4}).*?</span>', block)
+        if year is not None:
+            year = year.group(1)
+        else:
+            year = ""
 
-    def get_books_by_search(self, search_str):
-        link = self.base_href + "search?q=" + search_str.lower()
-        self.get_books_by_link(link)
+        link = re.search('<h3>.*?<a.*?href="(.*?)">', block)
+        if link is not None:
+            link = self.base_href + link.group(1)
+        else:
+            link = ""
 
 
-def book_from_xml(xml):
-    authors = re.findall('<author>(.+?)</author>', xml)
-    title = re.search('<title>(.+?)</title>', xml)
+        book = Publication(title, authors, year, link)
 
-    # title
-    if title is not None:
-        title = title.group(1)
-    else:
-        title = ""
+        desc = re.search('class="abstract">.*?<span.*?>(.*?)</span>.*?class="conference">.*?<span', block)
+        if desc is not None:
+            desc = desc.group(1)
+            book.add_description(desc)
 
-    # year
-    year = re.search('<year>(.+?)</year>', xml)
-    if year is not None:
-        year = year.group(1)
-    else:
-        year = ""
+        publisher = re.search('class="conference">.*?</span><a.*?>(.*?)</a>', block)
+        if publisher is not None:
+            publisher = publisher.group(1)
+            book.add_publisher(publisher)
 
-    # link
-    link = re.search('<ee>(.+?)</ee>', xml)
-    if link is not None:
-        link = link.group(1)
-    else:
-        link = ""
-
-    book = Publication(title, authors, year, link)
-
-    # contributor. It can be not existing
-    contributor = re.search('<journal>(.+?)</journal', xml)
-    if contributor is not None:
-        contributor = contributor.group(1)
-        book.add_contributor(contributor)
-
-    book.print_info()
+        book.print_info()

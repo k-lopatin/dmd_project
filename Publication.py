@@ -8,7 +8,7 @@ class Publication:
     link = ""
     description = ""
     language = ""
-    contributor = ""
+    publisher = ""
     rights = ""
 
     def __init__(self, title, authors, year, link):
@@ -20,8 +20,8 @@ class Publication:
     def add_description(self, description):
         self.description = description
 
-    def add_contributor(self, contributor):
-        self.contributor = contributor
+    def add_publisher(self, publisher):
+        self.publisher = publisher
 
     def rights(self, rights):
         self.rights = rights
@@ -32,4 +32,4 @@ class Publication:
             print(author)
         print(self.year)
         print(self.link)
-        print(self.contributor)
+        print(self.publisher)
