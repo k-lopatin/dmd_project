@@ -1,14 +1,18 @@
-__author__ = 'serge'
 import BSCrawler
-import Publication
+import psycopg2 as db
+
+__author__ = 'serge'
 
 bsc = BSCrawler.BSCrawler()
 
-import psycopg2 as db
-c = db.connect(database="dmd_project")
+# Connection conn = DriverManager.getConnection(5432, "postgres", "Sawyer8111998")
+# Statement s = conn.createStatement();
+# ResultSet r;
+
+c = db.connect(database = "dmd_project",  user = "postgres", password = "Sawyer8111998")
 cu = c.cursor()
 
-def create_tables(self):
+def create_tables():
     try:
         cu.execute("""
         CREATE TABLE publisher (
@@ -17,8 +21,7 @@ def create_tables(self):
         );
     """)
     except db.DatabaseError as x:
-        print ("Error", x)
-        c.commit()
+        print("Error", x)
 
     try:
         cu.execute("""
@@ -30,8 +33,7 @@ def create_tables(self):
         );
     """)
     except db.DatabaseError as x:
-        print ("Error", x)
-        c.commit()
+        print("Error", x)
 
     try:
         cu.execute("""
@@ -47,8 +49,7 @@ def create_tables(self):
         );
     """)
     except db.DatabaseError as x:
-        print ("Error", x)
-        c.commit()
+        print("Error", x)
 
     try:
         cu.execute("""
@@ -59,23 +60,25 @@ def create_tables(self):
     """)
 
     except db.DatabaseError as x:
-        print ("Error", x)
-        c.commit()
+        print("Error", x)
 
-        c.close()
+    c.close()
 
-def create_records(Publication):
     c.commit()
+
+
+def create_records(pub):
     cu.executemany("""
     INSERT INTO publisher (name)
-    VALUES (Publication.publisher);""")
+    VALUES (""" + pub.publisher + """);""")
     cu.executemany("""
     INSERT INTO publication (tittle, lang, year_publication, type_publication, url, subject, description)
-    VALUES (Publication.title, Publication.language, null, Publication.link, null, Publisher.description);""")
+    VALUES (""" + pub.title + """, """ + pub.language + """, null, """ + pub.link + """, null,""" +
+                   pub.description + """);""")
     # cu.executemany("""
     # INSERT INTO related (current_id, other_id)
     # VALUES (Publication.publication_id,
     # """)
-
     c.commit()
+    c.close()
 
