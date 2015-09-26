@@ -11,10 +11,10 @@ name_author3 varchar(50)
 
 CREATE TABLE publication (
 publication_id int PRIMARY KEY,
-tittle varchar(500) NOT NULL,
+title varchar(500) NOT NULL,
 lang char(2), 
 year_publication int,
-type_publication varchar(100) NOT NULL,
+type_publication varchar(100),
 url text NOT NULL,
 subject varchar(300),
 description text);
