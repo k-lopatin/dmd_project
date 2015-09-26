@@ -1,12 +1,15 @@
 CREATE TABLE publisher (
 publisher_id int PRIMARY KEY,
-name varchar(500) NOT NULL);
+name varchar(500) NOT NULL,
+publications_ids text(50)
+);
 
 CREATE TABLE author (
 author_id int PRIMARY KEY,
 name_author1 varchar(50),
 name_author2 varchar(50),
-name_author3 varchar(50)
+name_author3 varchar(50),
+publications_ids text(50)
 );
 
 CREATE TABLE publication (
@@ -22,5 +25,10 @@ description text);
 CREATE TABLE related (
 current_id int,
 other_id int
+);
+
+CREATE TABLE keywords (
+keyword text PRIMARY KEY,
+publications_ids text(50)
 );
 

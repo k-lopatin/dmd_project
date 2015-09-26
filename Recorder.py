@@ -17,9 +17,21 @@ def create_tables():
         cu.execute("""
         CREATE TABLE publisher (
         publisher_id int PRIMARY KEY,
-        name varchar(500) NOT NULL
+        name varchar(500) NOT NULL,
+        publications_ids text(50)
         );
     """)
+    except db.DatabaseError as x:
+        print("Error", x)
+
+    try:
+        cu.execute("""
+        CREATE TABLE keywords (
+        keyword text PRIMARY KEY,
+        publications_ids text(50)
+        );
+    """)
+
     except db.DatabaseError as x:
         print("Error", x)
 
@@ -29,7 +41,8 @@ def create_tables():
         author_id int PRIMARY KEY,
         name_author1 varchar(50),
         name_author2 varchar(50),
-        name_author3 varchar(50)
+        name_author3 varchar(50),
+        publications_ids text(50)
         );
     """)
     except db.DatabaseError as x:
@@ -62,10 +75,8 @@ def create_tables():
     except db.DatabaseError as x:
         print("Error", x)
 
-    c.close()
-
     c.commit()
-
+    c.close()
 
 def create_records(pub):
     cu.executemany("""

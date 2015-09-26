@@ -8,6 +8,5 @@ __author__ = 'lk1195'
 # # dblpCrawler.get_books_by_link('http://dblp.uni-trier.de/db/journals/corr/corr1501.html')
 # dblpCrawler.get_books_by_search("Cormen")
 
-
-bsCrawler = BSCrawler.BSCrawler()
-bsCrawler.get_books_by_search("Cormen")
+# bsCrawler = BSCrawler.BSCrawler()
+# bsCrawler.get_books_by_search("Cormen")
