@@ -1,6 +1,7 @@
 import requests
 import re
 from Publication import Publication
+import Recorder as rec
 import time
 
 
@@ -59,3 +60,4 @@ class BSCrawler:
             book.add_publisher(publisher)
 
         book.print_info()
+        rec.create_records(book)

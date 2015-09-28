@@ -1,7 +1,8 @@
 CREATE TABLE publisher (
-publisher_id int PRIMARY KEY,
+publisher_id serial NOT NULL,
 name varchar(500) NOT NULL,
-publications_ids text(50)
+publications_ids text(50),
+CONSTRAINT pub_id PRIMARY KEY (publisher_id)
 );
 
 CREATE TABLE author (
@@ -15,7 +16,7 @@ publications_ids text(50)
 CREATE TABLE publication (
 publication_id int PRIMARY KEY,
 title varchar(500) NOT NULL,
-lang char(2), 
+lang varchar(2),
 year_publication int,
 type_publication varchar(100),
 url text NOT NULL,
@@ -31,4 +32,3 @@ CREATE TABLE keywords (
 keyword text PRIMARY KEY,
 publications_ids text(50)
 );
-
