@@ -7,14 +7,13 @@ CONSTRAINT pub_id PRIMARY KEY (publisher_id)
 
 CREATE TABLE author (
 author_id int PRIMARY KEY,
-name_author1 varchar(50),
-name_author2 varchar(50),
-name_author3 varchar(50),
+name_author varchar(250),
 publications_ids text(50)
 );
 
 CREATE TABLE publication (
 publication_id int PRIMARY KEY,
+publisher_id int,
 title varchar(500) NOT NULL,
 lang varchar(2),
 year_publication int,

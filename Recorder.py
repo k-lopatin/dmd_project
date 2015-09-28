@@ -44,9 +44,7 @@ def create_tables():
         cu.execute("""
         CREATE TABLE author (
         author_id SERIAL PRIMARY KEY,
-        name_author1 varchar(50),
-        name_author2 varchar(50),
-        name_author3 varchar(50),
+        name_author varchar(250),
         publications_ids text
         );
     """)
@@ -98,7 +96,7 @@ def create_records(pub):
         pub_id = pub_id_query[0]
     else:
         cu.execute("INSERT INTO publisher (name) VALUES ('" + pub.publisher + "') RETURNING publisher_id")
-        pub_id_query = cu.fetchone();
+        pub_id_query = cu.fetchone()
         pub_id = pub_id_query[0]
     c.commit()
 
@@ -106,7 +104,17 @@ def create_records(pub):
                "VALUES ('" + pub.title + "', '" + pub.language + "', '" + pub.year + "', '" + "Science" + "', '" + pub.link + "', '" + "Subject" + "', '" + pub.description + "')")
     c.commit()
 
-    cu.execute()
+    cu.execute("SELECT author_id FROM author WHERE name_author = '" + pub.authors[0] + "'")
+    author_id_query = cu.fetchone()
+    author_id = 0
+    if author_id_query is not None:
+        author_id = author_id_query[0]
+    else:
+        cu.execute("INSERT INTO author (name_author) VALUES ('" + pub.authors[0] + "') RETURNING author_id")
+        author_id_query = cu.fetchone()
+        author_id = author_id_query[0]
+    c.commit()
+
     c.close()
 
 def delete_tables():
