@@ -59,7 +59,7 @@ def create_tables():
         cu.execute("""
         CREATE TABLE publication (
         publication_id SERIAL PRIMARY KEY,
-        tittle varchar(500) NOT NULL,
+        title varchar(500) NOT NULL,
         lang char(2),
         year_publication int,
         type_publication varchar(100) NOT NULL,
@@ -91,18 +91,22 @@ def create_tables():
 def create_records(pub):
     c = connect()
     cu = c.cursor()
-    cu.execute("INSERT INTO publisher (name) VALUES ('" + pub.publisher + "') RETURNING publisher_id")
-    # cu.execute("INSERT INTO publisher (name) SELECT '" + pub.publisher + "'"
-    #             "WHERE NOT EXISTS (SELECT 1 FROM publisher WHERE publisher.name = '" + pub.publisher + "') LIMIT 1;")
-    # cu.execute("CREATE OR REPLACE FUNCTION «public».«get_server» (varchar, integer) RETURNS integer AS"
-    #            "newId int"
-    #            "BEGIN;"
-    #            "SELECT publisher_id FROM publisher "
-    #            "WHERE publisher.name = $1"
-    #
-    #            )
-    # currentID = cu.execute("SELECT publisher_id FROM publisher WHERE publisher.name = '" + pub.publisher + "'")
+    cu.execute("SELECT publisher_id FROM publisher WHERE name = '" + pub.publisher + "'")
+    pub_id_query = cu.fetchone()
+    pub_id = 0
+    if pub_id_query is not None:
+        pub_id = pub_id_query[0]
+    else:
+        cu.execute("INSERT INTO publisher (name) VALUES ('" + pub.publisher + "') RETURNING publisher_id")
+        pub_id_query = cu.fetchone();
+        pub_id = pub_id_query[0]
     c.commit()
+
+    cu.execute("INSERT INTO publication (title, lang, year_publication, type_publication, url, subject, description)"
+               "VALUES ('" + pub.title + "', '" + pub.language + "', '" + pub.year + "', '" + "Science" + "', '" + pub.link + "', '" + "Subject" + "', '" + pub.description + "')")
+    c.commit()
+
+    cu.execute()
     c.close()
 
 def delete_tables():
