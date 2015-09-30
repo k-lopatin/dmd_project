@@ -105,11 +105,18 @@ def create_records(pub):
         pub_id_query = cu.fetchone()
 
     if pub_id_query is not None:
-         pub_id = pub_id_query[0]
+        pub_id = pub_id_query[0]
+        cu.execute("SELECT publication_id FROM publication WHERE title = %s", (pub.title, ))
+        public_id = cu.fetchone()
+        cu.execute("UPDATE publisher SET publications_ids = CASE "
+                       "WHEN publisher_id = %s THEN CONCAT(publications_ids, ' ', %s) ELSE publications_ids END", (pub_id, public_id))
     else:
-        cu.execute("INSERT INTO publisher (name) VALUES (%s) RETURNING publisher_id", (pub.publisher, ))
+        cu.execute("SELECT publication_id FROM publication WHERE title = %s", (pub.title, ))
+        public_id = cu.fetchone()
+        cu.execute("INSERT INTO publisher (name, publications_ids) VALUES (%s, %s) RETURNING publisher_id", (pub.publisher, public_id))
         pub_id_query = cu.fetchone()
         pub_id = pub_id_query[0]
+
     c.commit()
 
     cu.execute("INSERT INTO publication (title, lang, year_publication, type_publication, url, subject, description)"
