@@ -29,7 +29,8 @@ class Publication:
     def print_info(self):
         print(self.title)
         for author in self.authors:
-            print(author)
+            # print(author)
+            print(u'author')
         print(self.year)
         print(self.link)
         print(self.publisher)

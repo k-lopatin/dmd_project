@@ -2,6 +2,7 @@ import requests
 import re
 from Publication import Publication
 import time
+import Recorder as Rec
 
 
 class DBLPCrawler:
@@ -36,7 +37,7 @@ class DBLPCrawler:
         print()
 
     def get_books_by_search(self, search_str):
-        link = self.base_href + "search?q=" + search_str.lower()
+        link = self.base_href + "search/publ?q=" + search_str.lower()
         self.get_books_by_link(link)
 
 
@@ -70,6 +71,7 @@ def book_from_xml(xml):
     publisher = re.search('<journal>(.+?)</journal', xml)
     if publisher is not None:
         publisher = publisher.group(1)
-        book.add_contributor(publisher)
+        book.add_publisher(publisher)
 
     book.print_info()
+    Rec.create_records(book)

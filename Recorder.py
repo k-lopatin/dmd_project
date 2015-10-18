@@ -1,45 +1,73 @@
-import BSCrawler
 import psycopg2 as db
 
 __author__ = 'serge'
 
-bsc = BSCrawler.BSCrawler()
-
-# Connection conn = DriverManager.getConnection(5432, "postgres", "Sawyer8111998")
-# Statement s = conn.createStatement();
-# ResultSet r;
-
-c = db.connect(database = "dmd_project",  user = "postgres", password = "Sawyer8111998")
+c = db.connect(database="dmd_project", user="postgres", password="Sawyer8111998")
 cu = c.cursor()
+# return c
+
+def connect():
+    c = db.connect(database="dmd_project", user="postgres", password="Sawyer8111998")
+    # cu = c.cursor()
+    return c
 
 def create_tables():
     try:
         cu.execute("""
         CREATE TABLE publisher (
-        publisher_id int PRIMARY KEY,
-        name varchar(500) NOT NULL
+        publisher_id SERIAL NOT NULL,
+        name varchar(500) NOT NULL,
+        publications_ids text
         );
     """)
+        c.commit()
+
+    except db.DatabaseError as x:
+        print("Error", x)
+
+    try:
+        cu.execute("""
+        CREATE TABLE author_to_pub (
+        author_id int,
+        publication_id int
+        );
+    """)
+        c.commit()
+
+    except db.DatabaseError as x:
+        print("Error", x)
+
+    try:
+        cu.execute("""
+        CREATE TABLE keywords (
+        keyword text PRIMARY KEY,
+        publications_ids text
+        );
+    """)
+        c.commit()
+
     except db.DatabaseError as x:
         print("Error", x)
 
     try:
         cu.execute("""
         CREATE TABLE author (
-        author_id int PRIMARY KEY,
-        name_author1 varchar(50),
-        name_author2 varchar(50),
-        name_author3 varchar(50)
+        author_id SERIAL PRIMARY KEY,
+        name_author varchar(250),
+        publications_ids text
         );
     """)
+        c.commit()
+
     except db.DatabaseError as x:
         print("Error", x)
 
     try:
         cu.execute("""
         CREATE TABLE publication (
-        publication_id int PRIMARY KEY,
-        tittle varchar(500) NOT NULL,
+        publication_id SERIAL PRIMARY KEY,
+        publisher_id int,
+        title varchar(500) NOT NULL,
         lang char(2),
         year_publication int,
         type_publication varchar(100) NOT NULL,
@@ -48,6 +76,8 @@ def create_tables():
         description text
         );
     """)
+        c.commit()
+
     except db.DatabaseError as x:
         print("Error", x)
 
@@ -58,27 +88,88 @@ def create_tables():
         other_id int
         );
     """)
+        c.commit()
 
     except db.DatabaseError as x:
         print("Error", x)
 
-    c.close()
-
     c.commit()
-
+    c.close()
 
 def create_records(pub):
-    cu.executemany("""
-    INSERT INTO publisher (name)
-    VALUES (""" + pub.publisher + """);""")
-    cu.executemany("""
-    INSERT INTO publication (tittle, lang, year_publication, type_publication, url, subject, description)
-    VALUES (""" + pub.title + """, """ + pub.language + """, null, """ + pub.link + """, null,""" +
-                   pub.description + """);""")
-    # cu.executemany("""
-    # INSERT INTO related (current_id, other_id)
-    # VALUES (Publication.publication_id,
-    # """)
+    c = connect()
+    cu = c.cursor()
+    pub_id = 0
+    if pub.publisher is not None:
+        cu.execute("SELECT publisher_id FROM publisher WHERE name = %s", (pub.publisher, ))
+        pub_id_query = cu.fetchone()
+
+    if pub_id_query is not None:
+        pub_id = pub_id_query[0]
+        cu.execute("SELECT publication_id FROM publication WHERE title = %s", (pub.title, ))
+        public_id = cu.fetchone()
+        cu.execute("UPDATE publisher SET publications_ids = CASE "
+                       "WHEN publisher_id = %s THEN CONCAT(publications_ids, ' ', %s) ELSE publications_ids END", (pub_id, public_id))
+    else:
+        cu.execute("SELECT publication_id FROM publication WHERE title = %s", (pub.title, ))
+        public_id = cu.fetchone()
+        cu.execute("INSERT INTO publisher (name, publications_ids) VALUES (%s, %s) RETURNING publisher_id", (pub.publisher, public_id))
+        pub_id_query = cu.fetchone()
+        pub_id = pub_id_query[0]
+
     c.commit()
+
+    cu.execute("INSERT INTO publication (title, lang, year_publication, type_publication, url, subject, description)"
+     "VALUES (%s, %s, %s, %s, %s, %s, %s)", (pub.title, pub.language, pub.year, "Science Publication",
+     pub.link, "Math", pub.description))
+    c.commit()
+
+    i = 0
+    while i < len(pub.authors):
+        cu.execute("SELECT author_id FROM author WHERE name_author = %s", (pub.authors[i],))
+        author_id_query = cu.fetchone()
+        author_id = 0
+        if author_id_query is not None:
+            author_id = author_id_query[0]
+            cu.execute("SELECT author_id FROM author WHERE name_author = %s", (pub.authors[i],))
+            creator_id = cu.fetchone()
+            cu.execute("SELECT publication_id FROM publication WHERE title = %s", (pub.title, ))
+            public_id = cu.fetchone()
+            cu.execute("UPDATE author SET publications_ids = CASE "
+                       "WHEN author_id = %s THEN CONCAT(publications_ids, ' ', %s) ELSE publications_ids END", (creator_id, public_id))
+        else:
+            cu.execute("SELECT publication_id FROM publication WHERE title = %s", (pub.title, ))
+            public_id = cu.fetchone()
+            cu.execute("INSERT INTO author (name_author, publications_ids) VALUES (%s, %s) RETURNING author_id", (pub.authors[i], public_id))
+            author_id_query = cu.fetchone()
+            author_id = author_id_query[0]
+        i = i + 1
+        c.commit()
+
+    i = 0
+    while i < len(pub.authors):
+        cu.execute("INSERT INTO author_to_pub (author_id, publication_id) SELECT author_id, publication_id FROM author, publication "
+                       "WHERE name_author = %s AND publication.title = %s RETURNING author_id", (pub.authors[i], pub.title,))
+        new_author_id_query = cu.fetchone()
+        new_author_id = new_author_id_query
+        i = i + 1
+        c.commit()
+
+
+
+
     c.close()
 
+def delete_tables():
+    try:
+        cu.execute("""
+        DROP TABLE IF EXISTS publisher CASCADE;
+        DROP TABLE IF EXISTS author CASCADE;
+        DROP TABLE IF EXISTS publication CASCADE;
+        DROP TABLE IF EXISTS related CASCADE;
+        DROP TABLE IF EXISTS keywords CASCADE;
+    """)
+        c.commit()
+
+    except db.DatabaseError as x:
+        print("Error", x)
