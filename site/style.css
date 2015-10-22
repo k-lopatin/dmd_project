@@ -27,5 +27,104 @@ object {width: 470px;}
 	height: 200px;
 	width: 200px;
 	background-size: 200px 200px;
-	background-image: url(img/ficus1.png);
+	background-image: url(img/ficus.png);
+}
+
+.user-img{
+	position: relative;
+	color: white;
+	float: left;
+	height: 33px;
+	width: 32px;
+	padding-right: 40px;
+	background: url(img/user.png);
+	background-size: 32px 33px;
+	background-repeat: no-repeat;
+	margin-bottom: 0;
+	padding-bottom: 10px;
+}
+
+.cabinet-link{
+	text-decoration: none;
+	color: white;
+}
+
+.cabinet-link:hover{
+	text-decoration: none;
+	color: #DEDEDE;
+}
+
+.wrap {
+	width: 1137px;
+	margin: 0 auto;
+	position: relative;
+}
+
+.search-block {
+	position: relative;
+	background-color: #f1f1f1;
+	height: 80px;
+	width: 100%;	
+}
+
+.search-form {
+	display: inline-block;
+	padding-top: 20px;
+	position: relative;
+}
+
+.search-line {
+	height: 40px;
+	padding-left: 30px;
+	font-size: 24px;
+}
+
+.search-button{
+	position: absolute;
+	right: 5px;
+	top: 24px;
+	background: url(img/search.png) left 0 no-repeat;
+	background-size: 30px 30px;
+    width: 30px;
+    height: 30px;
+    margin: 0px 0 0 0px;
+    border: 0px solid #0996d4;
+    cursor: pointer;
+    z-index: 2;
+}
+
+.search-button:focus {
+	border: none;
+	outline: none;
+}
+
+.search-button:active {
+	border: none;
+	outline: none;
+}
+
+/*.search-button {
+	color:#fff;
+	height: 30px;
+	border: none;
+	background-color:#5cb85c;
+	margin-left: 20px; 
+	border-color:#4cae4c;
+	border-radius: 5px;
+}
+
+.search-button:hover {
+	color:#fff;
+	background-color:#449d44;
+	border-color:#398439
+}
+
+.search-button:focus {
+	color:#fff;
+	background-color:#449d44;
+	border-color:#255625
+}*/
+
+.filter-block{
+
 }
