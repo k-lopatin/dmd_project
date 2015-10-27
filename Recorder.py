@@ -2,12 +2,12 @@ import psycopg2 as db
 
 __author__ = 'serge'
 
-c = db.connect(database="dmd_project", user="postgres", password="Sawyer8111998")
+c = db.connect(database="dmd_project", user="postgres", password="admin")
 cu = c.cursor()
 # return c
 
 def connect():
-    c = db.connect(database="dmd_project", user="postgres", password="Sawyer8111998")
+    c = db.connect(database="dmd_project", user="postgres", password="admin")
     # cu = c.cursor()
     return c
 
@@ -67,6 +67,7 @@ def create_tables():
         CREATE TABLE publication (
         publication_id SERIAL PRIMARY KEY,
         publisher_id int,
+        institute text,
         title varchar(500) NOT NULL,
         lang char(2),
         year_publication int,
@@ -99,10 +100,10 @@ def create_tables():
 def create_records(pub):
     c = connect()
     cu = c.cursor()
-    pub_id = 0
     if pub.publisher is not None:
-        cu.execute("SELECT publisher_id FROM publisher WHERE name = %s", (pub.publisher, ))
+        cu.execute("SELECT publisher_id FROM publisher WHERE name = %s", (pub.publisher,))
         pub_id_query = cu.fetchone()
+        pub_id = 0
 
     if pub_id_query is not None:
         pub_id = pub_id_query[0]
@@ -116,11 +117,10 @@ def create_records(pub):
         cu.execute("INSERT INTO publisher (name, publications_ids) VALUES (%s, %s) RETURNING publisher_id", (pub.publisher, public_id))
         pub_id_query = cu.fetchone()
         pub_id = pub_id_query[0]
-
     c.commit()
 
-    cu.execute("INSERT INTO publication (title, lang, year_publication, type_publication, url, subject, description)"
-     "VALUES (%s, %s, %s, %s, %s, %s, %s)", (pub.title, pub.language, pub.year, "Science Publication",
+    cu.execute("INSERT INTO publication (publisher_id, title, lang, year_publication, type_publication, url, subject, description)"
+     "VALUES (%s, %s, %s, %s, %s, %s, %s, %s)", (pub_id, pub.title, pub.language, pub.year, "Science Publication",
      pub.link, "Math", pub.description))
     c.commit()
 
@@ -129,6 +129,7 @@ def create_records(pub):
         cu.execute("SELECT author_id FROM author WHERE name_author = %s", (pub.authors[i],))
         author_id_query = cu.fetchone()
         author_id = 0
+
         if author_id_query is not None:
             author_id = author_id_query[0]
             cu.execute("SELECT author_id FROM author WHERE name_author = %s", (pub.authors[i],))
@@ -168,6 +169,7 @@ def delete_tables():
         DROP TABLE IF EXISTS publication CASCADE;
         DROP TABLE IF EXISTS related CASCADE;
         DROP TABLE IF EXISTS keywords CASCADE;
+        DROP TABLE IF EXISTS author_to_pub CASCADE;
     """)
         c.commit()
 
