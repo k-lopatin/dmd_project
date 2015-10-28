@@ -120,7 +120,7 @@ def create_records(pub):
     c.commit()
 
     cu.execute("INSERT INTO publication (publisher_id, title, lang, year_publication, type_publication, url, subject, description)"
-     "VALUES (%s, %s, %s, %s, %s, %s, %s, %s)", (pub_id, pub.title, pub.language, pub.year, "Science Publication",
+     "VALUES (%s, %s, %s, %s, %s, %s, %s, %s)", (pub_id, pub.title, "EN", pub.year, "Science Publication",
      pub.link, "Math", pub.description))
     c.commit()
 
@@ -188,6 +188,7 @@ def delete_tables():
         DROP TABLE IF EXISTS publication CASCADE;
         DROP TABLE IF EXISTS related CASCADE;
         DROP TABLE IF EXISTS keywords CASCADE;
+        DROP TABLE IF EXISTS author_to_pub CASCADE;
     """)
         c.commit()
 
