@@ -24,11 +24,11 @@ class DBLPCrawler:
             count2 += 1
 
             if count > 10:
-                time.sleep(5)
+                # time.sleep(5)
                 count = 0
 
             count += 1
-            time.sleep(5)
+            # time.sleep(5)
 
     def get_book_xml(self, link):
         response = requests.get(self.base_xml_href + link + ".xml")

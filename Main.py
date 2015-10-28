@@ -11,9 +11,9 @@ dblpCrawler = DBLPCrawler.DBLPCrawler()
 
 # Recorder.delete_tables()
 Recorder.create_tables()
-dblpCrawler.get_books_by_search("Cormen")
-# bsCrawler = BSCrawler.BSCrawler()
-# bsCrawler.get_books_by_search("Cormen")
+# dblpCrawler.get_books_by_search("Cormen")
+bsCrawler = BSCrawler.BSCrawler()
+bsCrawler.get_books_by_search("Cormen")
 
 
 
