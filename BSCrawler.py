@@ -11,8 +11,16 @@ class BSCrawler:
 
     def get_books_by_search(self, s):
 
-        link = self.base_href + "Search?query=" + s.lower()
+        start = 0
+        end = 50
+        while end < 1000:
+            link = self.base_href + "Search?query=" + s.lower() \
+                   + "&start=" + str(start) + "&end=" + str(end)
+            start += 50
+            end += 50
+            self.get_books_by_search_link(link)
 
+    def get_books_by_search_link(self, link):
         response = requests.get(link)
         html = response.text
         # html = re.sub("\r", '', html)
@@ -38,14 +46,13 @@ class BSCrawler:
         if year is not None:
             year = year.group(1)
         else:
-            year = ""
+            year = 0
 
         link = re.search('<h3>.*?<a.*?href="(.*?)">', block)
         if link is not None:
             link = self.base_href + link.group(1)
         else:
             link = ""
-
 
         book = Publication(title, authors, year, link)
 
@@ -59,5 +66,17 @@ class BSCrawler:
             publisher = publisher.group(1)
             book.add_publisher(publisher)
 
+        book.add_keywords(self.get_keywords_by_title(title))
+
         book.print_info()
         rec.create_records(book)
+
+    def get_keywords_by_title(self, title):
+        words = title.split()
+        keywords = []
+
+        for word in words:
+            if len(word) > 3:
+                keywords.append(word)
+
+        return keywords
