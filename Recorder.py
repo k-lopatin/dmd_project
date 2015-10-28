@@ -119,8 +119,8 @@ def create_records(pub):
 
     c.commit()
 
-    cu.execute("INSERT INTO publication (title, lang, year_publication, type_publication, url, subject, description)"
-     "VALUES (%s, %s, %s, %s, %s, %s, %s)", (pub.title, "EN", pub.year, "Science Publication",
+    cu.execute("INSERT INTO publication (publisher_id, title, lang, year_publication, type_publication, url, subject, description)"
+     "VALUES (%s, %s, %s, %s, %s, %s, %s, %s)", (pub_id, pub.title, pub.language, pub.year, "Science Publication",
      pub.link, "Math", pub.description))
     c.commit()
 
